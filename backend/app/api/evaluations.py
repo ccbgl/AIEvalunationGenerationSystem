@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from backend.app.deps import get_current_user
 from backend.app.db.session import AsyncSessionLocal
 from backend.app.models.models import UserEvaluation, EvaluationLike, EvaluationReply, Shop
-from sqlalchemy import select, insert
+from sqlalchemy import select, func
 from backend.app.services.ai_service import generate_evaluation
 from backend.app.services.stats import recompute_good_rate
 import asyncio
@@ -110,3 +110,54 @@ async def reply_evaluation(evaluation_id: int, content: str, parent_reply_id: in
             session.add(ev)
         await session.commit()
         return {"id": reply.id}
+
+@router.get('/user', response_model=list)
+async def list_my_evaluations(current_user: dict = Depends(get_current_user)):
+    async with AsyncSessionLocal() as session:
+        q = select(UserEvaluation).where(UserEvaluation.user_id == current_user['id']).order_by(UserEvaluation.create_time.desc())
+        res = await session.execute(q)
+        rows = res.scalars().all()
+        out = []
+        for r in rows:
+            out.append({
+                "id": r.id,
+                "shop_id": r.shop_id,
+                "level": r.level.name if hasattr(r.level, 'name') else str(r.level),
+                "tags": r.tags,
+                "target_platform": r.target_platform,
+                "content": r.content,
+                "is_ai_generated": bool(r.is_ai_generated),
+                "like_count": r.like_count,
+                "reply_count": r.reply_count,
+                "create_time": r.create_time.isoformat()
+            })
+        return out
+
+@router.get('/user_paginated')
+async def list_my_evaluations_paginated(page: int = 1, page_size: int = 10, current_user: dict = Depends(get_current_user)):
+    """Return paginated list of current user's evaluations."""
+    if page < 1:
+        page = 1
+    if page_size < 1:
+        page_size = 10
+    async with AsyncSessionLocal() as session:
+        total_q = select(func.count()).select_from(UserEvaluation).where(UserEvaluation.user_id == current_user['id'])
+        total = (await session.execute(total_q)).scalar() or 0
+        q = select(UserEvaluation).where(UserEvaluation.user_id == current_user['id']).order_by(UserEvaluation.create_time.desc()).offset((page-1)*page_size).limit(page_size)
+        res = await session.execute(q)
+        rows = res.scalars().all()
+        items = []
+        for r in rows:
+            items.append({
+                "id": r.id,
+                "shop_id": r.shop_id,
+                "level": r.level.name if hasattr(r.level, 'name') else str(r.level),
+                "tags": r.tags,
+                "target_platform": r.target_platform,
+                "content": r.content,
+                "is_ai_generated": bool(r.is_ai_generated),
+                "like_count": r.like_count,
+                "reply_count": r.reply_count,
+                "create_time": r.create_time.isoformat()
+            })
+        return {"total": total, "page": page, "page_size": page_size, "items": items}
