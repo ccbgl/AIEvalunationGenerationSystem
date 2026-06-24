@@ -10,6 +10,7 @@ import asyncio
 import aioredis
 from backend.app.core.config import settings
 from datetime import datetime
+import math
 
 router = APIRouter(prefix='/api/evaluations', tags=['evaluations'])
 
@@ -143,6 +144,8 @@ async def list_my_evaluations_paginated(page: int = 1, page_size: int = 10, curr
     async with AsyncSessionLocal() as session:
         total_q = select(func.count()).select_from(UserEvaluation).where(UserEvaluation.user_id == current_user['id'])
         total = (await session.execute(total_q)).scalar() or 0
+        # calculate total_pages using math.ceil, ensure at least 1
+        total_pages = max(1, math.ceil(total / page_size)) if page_size else 1
         q = select(UserEvaluation).where(UserEvaluation.user_id == current_user['id']).order_by(UserEvaluation.create_time.desc()).offset((page-1)*page_size).limit(page_size)
         res = await session.execute(q)
         rows = res.scalars().all()
@@ -160,4 +163,4 @@ async def list_my_evaluations_paginated(page: int = 1, page_size: int = 10, curr
                 "reply_count": r.reply_count,
                 "create_time": r.create_time.isoformat()
             })
-        return {"total": total, "page": page, "page_size": page_size, "items": items}
+        return {"total": total, "total_pages": total_pages, "page": page, "page_size": page_size, "items": items}
