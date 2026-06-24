@@ -8,6 +8,7 @@ import Login from './pages/Login.vue'
 import Register from './pages/Register.vue'
 import MyAccount from './pages/MyAccount.vue'
 import './assets/styles.css'
+import i18n from './i18n'
 
 const routes = [
   { path: '/', component: ShopList },
@@ -20,4 +21,4 @@ const routes = [
 
 const router = createRouter({ history: createWebHistory(), routes })
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(router).use(i18n).mount('#app')

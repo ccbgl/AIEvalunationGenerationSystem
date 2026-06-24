@@ -1,3 +1,10 @@
 from .auth import router as auth
 from .ai import router as ai
 from .mock_shops import router as mock_shops
+from .shops import router as shops
+from .files import router as files
+from .products import router as products
+from .evaluations import router as evaluations
+from .admin import router as admin
+from .history import router as history
+from .collection import router as collection

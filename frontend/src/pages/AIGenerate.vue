@@ -1,9 +1,9 @@
 <template>
   <div class="page"><Header />
     <main>
-      <h2>AI Generate Review</h2>
+      <h2>{{ $t('ai_generate') }}</h2>
       <form @submit.prevent="onGenerate">
-        <label>Shop ID: <input v-model="shop_id" /></label>
+        <label>{{ $t('shops') }} ID: <input v-model="shop_id" /></label>
         <label>Level:
           <select v-model="level">
             <option value="recommend">Recommend</option>
@@ -11,22 +11,22 @@
             <option value="bad">Bad</option>
           </select>
         </label>
-        <label>Tags: <input v-model="tags" placeholder="comma separated"/></label>
+        <label>Tags: <input v-model="tags" placeholder="service,fast"/></label>
         <label>Target Platform:
           <select v-model="target_platform">
             <option value="google">Google</option>
             <option value="xiaohongshu">小红书</option>
           </select>
         </label>
-        <button type="submit">Generate</button>
+        <button type="submit">{{ $t('generate') }}</button>
       </form>
 
       <div v-if="loading">Generating...</div>
       <pre v-if="result">{{ result }}</pre>
 
       <div class="actions">
-        <button @click="copyText">Copy to clipboard</button>
-        <button @click="submitEval">Submit to site</button>
+        <button @click="copyText">{{ $t('copy') }}</button>
+        <button @click="submitEval">{{ $t('submit') }}</button>
       </div>
     </main>
   </div>

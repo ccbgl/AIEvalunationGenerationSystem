@@ -2,7 +2,7 @@
   <div class="page">
     <Header />
     <main>
-      <h2>My Account</h2>
+      <h2>{{ $t('my') }}</h2>
       <div>Username: {{ user?.username }}</div>
       <div>Role: {{ user?.role }}</div>
       <button @click="logout">Logout</button>

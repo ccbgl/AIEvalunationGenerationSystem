@@ -2,11 +2,11 @@
   <div class="page">
     <Header />
     <main>
-      <h2>Login</h2>
+      <h2>{{ $t('login') }}</h2>
       <form @submit.prevent="onLogin">
         <input v-model="username" placeholder="username" />
         <input v-model="password" type="password" placeholder="password" />
-        <button type="submit">Login</button>
+        <button type="submit">{{ $t('login') }}</button>
       </form>
     </main>
   </div>

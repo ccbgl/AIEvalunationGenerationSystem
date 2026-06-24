@@ -3,8 +3,11 @@
     <Header />
     <main>
       <div class="search-row">
-        <input v-model="q" placeholder="Search shops" />
+        <input v-model="q" :placeholder="$t('search_placeholder')" />
         <button @click="fetchShops">Search</button>
+      </div>
+      <div class="hero">
+        <img src="/static/img/cover.jpg" alt="hero" />
       </div>
       <div>
         <ShopCard v-for="s in shops" :key="s.id" :shop="s" />
@@ -38,4 +41,5 @@ onMounted(()=>{
 .page main{padding:12px}
 .search-row{display:flex;gap:8px;margin-bottom:12px}
 .search-row input{flex:1;padding:8px;border-radius:6px;border:1px solid #ddd}
+.hero img{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:12px}
 </style>

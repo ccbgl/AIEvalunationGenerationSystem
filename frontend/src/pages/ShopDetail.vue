@@ -6,9 +6,10 @@
         <h2>{{ shop.shop_name }}</h2>
         <img :src="shop.cover_image || '/static/img/cover.jpg'" alt="cover" style="width:100%;height:160px;object-fit:cover;border-radius:8px"/>
         <div class="meta">{{ shop.description }}</div>
+        <div class="meta">{{ $t('avg') }}: ${{ shop.avg_cost }} · {{ $t('good_rate') }}: {{ shop.good_rate }}%</div>
         <div class="actions">
           <router-link to="/">Back</router-link>
-          <router-link to="/ai">AI Generate</router-link>
+          <router-link to="/ai">{{ $t('ai_generate') }}</router-link>
         </div>
       </div>
     </main>

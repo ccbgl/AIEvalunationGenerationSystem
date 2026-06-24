@@ -1,13 +1,10 @@
 from __future__ import annotations
-
 import os
 from dotenv import load_dotenv
-# 报错
-from pydantic_settings import BaseSettings
 
 load_dotenv()
 
-class Settings(BaseSettings):
+class Settings:
     MYSQL_URL: str = os.getenv("MYSQL_URL", "mysql+aiomysql://root:123456@127.0.0.1:3306/tea_shop")
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
     MODEL_API_KEY: str = os.getenv("MODEL_API_KEY", "")
