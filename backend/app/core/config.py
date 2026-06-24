@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings
 load_dotenv()
 
 class Settings(BaseSettings):
-    MYSQL_URL: str = os.getenv("MYSQL_URL", "mysql+aiomysql://root:root@127.0.0.1:3306/tea_shop")
+    MYSQL_URL: str = os.getenv("MYSQL_URL", "mysql+aiomysql://root:123456@127.0.0.1:3306/tea_shop")
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
     MODEL_API_KEY: str = os.getenv("MODEL_API_KEY", "")
     MODEL_NAME: str = os.getenv("MODEL_NAME", "")
