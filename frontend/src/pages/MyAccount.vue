@@ -44,10 +44,23 @@
             </li>
           </ul>
 
-          <div class="pagination" v-if="total>page_size">
+          <div class="pagination-controls">
+            <label>Page size:
+              <select v-model.number="page_size" @change="onPageSizeChange">
+                <option :value="5">5</option>
+                <option :value="10">10</option>
+                <option :value="20">20</option>
+              </select>
+            </label>
+
             <button :disabled="page<=1" @click="changePage(page-1)">Prev</button>
             <span>Page {{ page }} / {{ totalPages }}</span>
             <button :disabled="page>=totalPages" @click="changePage(page+1)">Next</button>
+
+            <label>Jump to:
+              <input type="number" v-model.number="jumpTo" min="1" :max="totalPages" />
+            </label>
+            <button @click="goToJump">Go</button>
           </div>
         </section>
       </div>
@@ -72,6 +85,7 @@ const router = useRouter()
 const page = ref(1)
 const page_size = ref(5)
 const total = ref(0)
+const jumpTo = ref(1)
 
 const totalPages = computed(()=> Math.max(1, Math.ceil(total.value / page_size.value)))
 
@@ -119,6 +133,8 @@ async function loadEvaluations(){
     const res = await api.get('/api/evaluations/user_paginated', { params: { page: page.value, page_size: page_size.value } })
     evaluations.value = res.data.items
     total.value = res.data.total
+    // sync jumpTo with current page
+    jumpTo.value = page.value
   }catch(e){ console.warn('evaluations err', e); evaluations.value = []; total.value = 0 }
 }
 
@@ -155,6 +171,19 @@ function changePage(p){
   loadEvaluations()
 }
 
+function onPageSizeChange(){
+  page.value = 1
+  loadEvaluations()
+}
+
+function goToJump(){
+  let p = Number(jumpTo.value) || 1
+  if(p < 1) p = 1
+  if(p > totalPages.value) p = totalPages.value
+  page.value = p
+  loadEvaluations()
+}
+
 onMounted(()=> load())
 </script>
 
@@ -164,5 +193,5 @@ onMounted(()=> load())
 .section ul{list-style:none;padding:0}
 .section li{padding:8px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
 button{padding:6px 10px;border-radius:6px;border:none;background:#ff6b6b;color:#fff}
-.pagination{display:flex;align-items:center;gap:12px;margin-top:12px}
+.pagination-controls{display:flex;align-items:center;gap:12px;margin-top:12px}
 </style>
