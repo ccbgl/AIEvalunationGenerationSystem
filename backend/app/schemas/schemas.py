@@ -20,6 +20,11 @@ class TokenResp(BaseModel):
     token: str
     expire_hours: int
 
+class RegisterResp(BaseModel):
+    user: UserOut
+    token: str
+    expire_hours: int
+
 class ShopBase(BaseModel):
     shop_name: str
     address: str
@@ -39,4 +44,7 @@ class AIGenerateRequest(BaseModel):
 
 class AIGenerateResp(BaseModel):
     content: str
+
+class LogoutReq(BaseModel):
+    token: str
 

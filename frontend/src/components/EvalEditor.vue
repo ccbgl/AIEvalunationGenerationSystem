@@ -1,10 +1,10 @@
 <template>
   <div>
-    <label>Content</label>
-    <textarea v-model="model.content" rows="6" placeholder="AI or manual content" />
+    <label>{{ $t('content_label') }}</label>
+    <textarea v-model="model.content" rows="6" :placeholder="$t('content_placeholder')" />
     <div class="row">
-      <button @click="$emit('generate')">AI Generate</button>
-      <button @click="$emit('submit')">Submit</button>
+      <button @click="$emit('generate')">{{ $t('ai_generate_button') }}</button>
+      <button @click="$emit('submit')">{{ $t('submit') }}</button>
     </div>
   </div>
 </template>

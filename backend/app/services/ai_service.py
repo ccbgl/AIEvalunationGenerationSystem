@@ -3,13 +3,25 @@ from backend.app.core.config import settings
 from backend.app.schemas.schemas import AIGenerateRequest
 
 async def generate_evaluation(req: AIGenerateRequest) -> str:
-    # assemble a lightweight prompt per docs
-    tags = ', '.join(req.tags)
+    # assemble a lightweight prompt including optional shop info when available
+    tags = ', '.join(getattr(req, 'tags', []) or [])
+    shop_name = getattr(req, 'shop_name', '') or ''
+    shop_desc = getattr(req, 'shop_description', '') or ''
     prompt = ''
     if req.target_platform.lower() == 'google':
-        prompt = f"You are a helpful local reviewer. Write an objective short English review for the shop id {req.shop_id}. Level: {req.level}. Tags: {tags}. Keep it natural and suitable for Google reviews."
+        if shop_name:
+            prompt = (f"You are a helpful local reviewer. Write an objective short English review for '{shop_name}' "
+                      f"(shop id {req.shop_id}). Level: {req.level}. Tags: {tags}. Briefly mention: {shop_desc}. "
+                      "Keep it natural and suitable for Google reviews.")
+        else:
+            prompt = (f"You are a helpful local reviewer. Write an objective short English review for the shop id {req.shop_id}. "
+                      f"Level: {req.level}. Tags: {tags}. Keep it natural and suitable for Google reviews.")
     else:
-        prompt = f"你是一个热情的笔记作者。为店铺 {req.shop_id} 写一段小红书风格的中文种草笔记，等级 {req.level}，标签：{tags}。包含 Emoji，段落分行。"
+        if shop_name:
+            prompt = (f"你是一个热情的笔记作者。为店铺『{shop_name}』（id {req.shop_id}）写一段小红书风格的中文种草笔记，等级 {req.level}，标签：{tags}。"
+                      f"可包含店铺信息：{shop_desc}。包含 Emoji，段落分行。")
+        else:
+            prompt = (f"你是一个热情的笔记作者。为店铺 {req.shop_id} 写一段小红书风格的中文种草笔记，等级 {req.level}，标签：{tags}。包含 Emoji，段落分行。")
 
     # placeholder: call a hypothetical third-party API via HTTP
     headers = {"Authorization": f"Bearer {settings.MODEL_API_KEY}"}

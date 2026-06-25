@@ -8,12 +8,14 @@ router = APIRouter(prefix='/api/files', tags=['files'])
 
 @router.post('/upload')
 async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
-    # store under /app/upload/<user_id>/...
+    # store under backend/app/static/upload/<user_id>/...
     filename = file.filename
     user_id = current_user['id']
-    dest_dir = os.getenv('UPLOAD_DIR', '/app/upload')
+    # default upload dir inside static so files are served by StaticFiles
+    dest_dir = os.getenv('UPLOAD_DIR', 'backend/app/static/upload')
     os.makedirs(dest_dir, exist_ok=True)
     dest_path = os.path.join(dest_dir, f"user_{user_id}_{filename}")
     await save_upload_file(file, dest_path)
-    # return relative path for storage in DB
-    return {"path": dest_path}
+    # return web-accessible path
+    web_path = '/static/upload/' + os.path.basename(dest_path)
+    return {"path": web_path}

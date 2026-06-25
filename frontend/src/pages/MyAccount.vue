@@ -11,27 +11,27 @@
         </div>
 
         <section class="section">
-          <h3>My Collections</h3>
-          <div v-if="collections.length===0">No collections</div>
+          <h3>{{ $t('my_collections') }}</h3>
+          <div v-if="collections.length===0">{{ $t('no_collections') }}</div>
           <ul>
             <li v-for="c in collections" :key="c.shop_id">
               <router-link :to="`/shop/${c.shop_id}`">{{ c.shop_name }}</router-link>
-              <button @click="uncollect(c.shop_id)">Uncollect</button>
+              <button @click="uncollect(c.shop_id)">{{ $t('uncollect') }}</button>
             </li>
           </ul>
         </section>
 
         <section class="section">
-          <h3>Browse History</h3>
-          <div v-if="history.length===0">No history</div>
+          <h3>{{ $t('no_history') }}</h3>
+          <div v-if="history.length===0">{{ $t('no_history') }}</div>
           <ul>
             <li v-for="h in history" :key="h.id">
               <router-link :to="`/shop/${h.shop_id}`">{{ h.shop_name }}</router-link>
               <small>{{ formatTime(h.browse_time) }}</small>
-              <button @click="deleteHistory(h.id)">Delete</button>
+              <button @click="deleteHistory(h.id)">{{ $t('delete') }}</button>
             </li>
           </ul>
-          <div v-if="history.length>0"><button @click="clearHistory">Clear All History</button></div>
+          <div v-if="history.length>0"><button @click="clearHistory">{{ $t('clear_all_history') }}</button></div>
         </section>
 
         <section class="section">
@@ -70,9 +70,12 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Header from '../components/Header.vue'
 import api from '../api'
 import { useRouter } from 'vue-router'
+
+const { t } = useI18n()
 
 const user = ref(null)
 const collections = ref([])
@@ -138,8 +141,15 @@ async function loadEvaluations(){
   }catch(e){ console.warn('evaluations err', e); evaluations.value = []; total.value = 0 }
 }
 
-function logout(){
+async function logout(){
+  const token = localStorage.getItem('token')
+  try{
+    if(token){
+      await api.post('/api/auth/logout')
+    }
+  }catch(e){ console.warn('logout api failed', e) }
   localStorage.removeItem('token')
+  localStorage.removeItem('user')
   router.push('/login')
 }
 
@@ -147,21 +157,21 @@ async function uncollect(shop_id){
   try{
     await api.delete('/api/collection', { params: { shop_id } })
     collections.value = collections.value.filter(c => c.shop_id !== shop_id)
-  }catch(e){ alert('uncollect failed') }
+  }catch(e){ alert(t('uncollect_failed')) }
 }
 
 async function deleteHistory(id){
   try{
     await api.delete(`/api/history/${id}`)
     history.value = history.value.filter(h => h.id !== id)
-  }catch(e){ alert('delete failed') }
+  }catch(e){ alert(t('delete_failed')) }
 }
 
 async function clearHistory(){
   try{
     await api.delete('/api/history')
     history.value = []
-  }catch(e){ alert('clear failed') }
+  }catch(e){ alert(t('clear_failed')) }
 }
 
 function changePage(p){
